@@ -45,6 +45,12 @@ export default defineType({
       title: 'Closing Text Color',
       type: 'color',
     }),
+
+    defineField({
+      name: 'seo',
+      title: 'SEO',
+      type: 'seo',
+    }),
   ],
   preview: {
     prepare() {

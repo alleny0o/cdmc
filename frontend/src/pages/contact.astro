@@ -9,8 +9,12 @@ const settings = (await getSettings()) as Settings;
 ---
 
 <Layout
-  title={`${contact?.heading || "Contact"} | ${settings?.churchName || "CDMC"}`}
-  description={`Get in touch with ${settings?.churchName || "Christ Disciple Mission Church"}`}
+  settings={settings}
+  pageSeo={{
+    title: contact?.seo?.metaTitle,
+    description: contact?.seo?.metaDescription,
+    ogImage: contact?.seo?.ogImage,
+  }}
 >
   <ContactComponent contact={contact} settings={settings} />
 </Layout>

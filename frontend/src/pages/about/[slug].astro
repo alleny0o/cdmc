@@ -1,6 +1,6 @@
 ---
-import { getTeamMembers, getTeamMember } from "../../utils/sanity";
-import type { TeamMember } from "../../utils/sanity";
+import { getTeamMembers, getTeamMember, getSettings } from "../../utils/sanity";
+import type { TeamMember, Settings } from "../../utils/sanity";
 import { urlFor } from "../../utils/image";
 import { PortableText } from "astro-portabletext";
 import Layout from "../../layouts/Layout.astro";
@@ -14,14 +14,24 @@ export async function getStaticPaths() {
 }
 
 const { slug } = Astro.params;
-const member = (await getTeamMember(slug!)) as TeamMember;
+const [member, settings] = await Promise.all([
+  getTeamMember(slug!) as Promise<TeamMember>,
+  getSettings() as Promise<Settings>,
+]);
 
 if (!member) {
   return Astro.redirect("/about");
 }
 ---
 
-<Layout title={member.name}>
+<Layout
+  settings={settings}
+  pageSeo={{
+    title: member.seo?.metaTitle ?? member.name,
+    description: member.seo?.metaDescription,
+    ogImage: member.seo?.ogImage ?? member.image,
+  }}
+>
   <section class="bg-white text-[#111111]">
     <Container class="py-20">
 
@@ -67,6 +77,39 @@ if (!member) {
     </Container>
   </section>
 </Layout>
+
+<script
+  is:inline
+  type="application/ld+json"
+  set:html={JSON.stringify([
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: member.name,
+      jobTitle: member.role,
+      image: member.image
+        ? urlFor(member.image).width(800).auto("format").quality(80).url()
+        : undefined,
+      worksFor: settings?.churchName
+        ? { "@type": "Church", name: settings.churchName }
+        : undefined,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: Astro.site?.href },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "About",
+          item: `${Astro.site?.href ?? ""}about`,
+        },
+        { "@type": "ListItem", position: 3, name: member.name, item: Astro.url.href },
+      ],
+    },
+  ])}
+/>
 
 <style>
   .bio-body :global(p + p) {

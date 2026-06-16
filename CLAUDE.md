@@ -52,7 +52,7 @@ Collection documents (multiple records):
 - `teamMember` — staff/team members with slug, ordered by `order` field; each has a detail page at `/about/[slug]`
 
 Object types (reusable, not top-level documents):
-- `blockContent` — Portable Text type used for rich text fields (body, bio)
+- `blockContent` — Portable Text type used for rich text fields (body, bio); rendered with `astro-portabletext`
 - `seo` — reusable SEO object (metaTitle, metaDescription, ogImage) used in post pages
 
 ### Frontend Pages & Components
@@ -62,11 +62,19 @@ Object types (reusable, not top-level documents):
 - `frontend/src/pages/contact.astro` — contact page
 - `frontend/src/layouts/Layout.astro` — main shell with SEO meta, Header, Footer, VisualEditing
 - `frontend/src/layouts/Bare.astro` — layout without header/footer
+- `frontend/src/components/Container.astro` — shared wrapper: `max-w-7xl mx-auto px-6 md:px-12`; accepts optional `class` prop for extra classes
 - `frontend/src/utils/image.ts` — `urlFor()` and `buildSrcSet()` helpers for Sanity images
 - `frontend/src/utils/index.ts` — `formatDate()` utility
 
+**Template remnants (unused, can be deleted):** `Welcome.astro`, `CodeBlock.astro`, `post/[slug].astro` — these are leftover from the Sanity Astro starter. `post/[slug].astro` calls `getPost()` which does not exist in `sanity.ts`.
+
+### GROQ Image Queries
+All image fields in `sanity.ts` use the shared `imageProjection` snippet, which expands each image with `width`, `height`, and `lqip` (low-quality image placeholder). When writing new GROQ queries that include images, always append `${imageProjection}` after the field name.
+
 ### Styling
 Tailwind CSS v4 (via `@tailwindcss/vite` plugin). Colors are driven by Sanity content (stored as `@sanity/color-input` values with `.hex`).
+
+Fonts loaded in `Layout.astro` and `Bare.astro` via Google Fonts: Inter and Playfair Display. **Note:** `global.css` maps `--font-serif` to `"Lora"` (not Playfair Display), which means `font-serif` utility classes fall back to the system serif font — this is a bug. New serif text should use an inline `font-family` style or fix the CSS variable to reference `"Playfair Display"`.
 
 ### Visual Editing
 Controlled by `PUBLIC_SANITY_VISUAL_EDITING_ENABLED`. When `"true"`:
@@ -105,12 +113,12 @@ SANITY_STUDIO_STUDIO_HOST=         # Subdomain for sanity.studio deploy
 ## Design System
 
 - Minimalist, understated aesthetic — small church (15 members), not megachurch
-- Container pattern: `max-w-7xl mx-auto px-8 py-20` — every section uses this
+- Container: use `<Container>` component (`max-w-7xl mx-auto px-6 md:px-12`); add `py-20` per section as needed
 - Labels: `text-xs uppercase tracking-[0.25em]` with low opacity (0.4–0.5)
 - Dividers: `w-8 h-px` with low opacity (0.2)
 - Tailwind for all layout — no scoped CSS for spacing/sizing
 - Scoped `<style define:vars>` only for dynamic Sanity colors (backgroundColor, textColor)
-- Typography: Inter (font-sans, font-light) for UI, Playfair Display (font-serif italic) for quotes/body
+- Typography: Inter (`font-sans font-light`) for UI, Playfair Display (`font-serif italic`) for quotes/body — see font bug note above
 - No React, no client-side JS unless absolutely necessary
 - Pages: Home, About, Contact — nothing else
 - Header and Footer render on every page via Layout.astro

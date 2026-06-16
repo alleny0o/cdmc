@@ -6,5 +6,6 @@ import header from './documents/header'
 import footer from './documents/footer'
 import contact from './documents/contact'
 import about from './documents/about'
+import teamMember from './documents/teamMember'
 
-export const schemaTypes = [settings, home, about, header, footer, contact, blockContent, seo]
+export const schemaTypes = [settings, home, about, header, footer, contact, blockContent, seo, teamMember]

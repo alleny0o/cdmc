@@ -43,6 +43,12 @@ export default defineType({
       description: 'Lower numbers appear first',
       initialValue: 99,
     }),
+
+    defineField({
+      name: 'seo',
+      title: 'SEO',
+      type: 'seo',
+    }),
   ],
   preview: {
     select: {

@@ -2,7 +2,7 @@ import {defineField, defineType} from 'sanity'
 
 export default defineType({
   name: 'about',
-  title: 'About',
+  title: 'About Page',
   type: 'document',
   fields: [
     // About Us
@@ -124,6 +124,12 @@ export default defineType({
           type: 'color',
         }),
       ],
+    }),
+
+    defineField({
+      name: 'seo',
+      title: 'SEO',
+      type: 'seo',
     }),
   ],
   preview: {

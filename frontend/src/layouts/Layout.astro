@@ -3,15 +3,53 @@ import { VisualEditing } from "@sanity/astro/visual-editing";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import "../styles/global.css";
+import { urlFor } from "../utils/image";
+import type { Settings, SanityImage } from "../utils/sanity";
 
 interface Props {
-  title?: string;
-  description?: string;
-  image?: string;
+  settings?: Settings;
+  pageSeo?: {
+    title?: string;
+    description?: string;
+    ogImage?: SanityImage;
+  };
 }
 
-const { title, description, image } = Astro.props;
+const { settings, pageSeo } = Astro.props;
+
+const title =
+  pageSeo?.title ?? settings?.siteTitle ?? settings?.churchName ?? "CDMC";
+const description = pageSeo?.description ?? settings?.siteDescription ?? "";
+const ogImageSource = pageSeo?.ogImage ?? settings?.ogImage;
+const ogImageUrl = ogImageSource
+  ? urlFor(ogImageSource).width(1200).height(630).fit("crop").auto("format").quality(80).url()
+  : undefined;
 const canonicalURL = Astro.url;
+
+const churchJsonLd = settings
+  ? {
+      "@context": "https://schema.org",
+      "@type": "Church",
+      name: settings.churchName,
+      description: settings.siteDescription,
+      url: Astro.site?.href,
+      telephone: settings.phone,
+      email: settings.email,
+      address: settings.address
+        ? { "@type": "PostalAddress", streetAddress: settings.address }
+        : undefined,
+      image: ogImageUrl,
+    }
+  : null;
+
+const websiteJsonLd = settings
+  ? {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: settings.churchName,
+      url: Astro.site?.href,
+    }
+  : null;
 
 const visualEditingEnabled =
   import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
@@ -22,7 +60,7 @@ const visualEditingEnabled =
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <meta name="generator" content={Astro.generator} />
     <link rel="canonical" href={canonicalURL} />
 
@@ -34,19 +72,41 @@ const visualEditingEnabled =
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalURL} />
-    {title && <meta property="og:title" content={title} />}
+    <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}
-    {image && <meta property="og:image" content={image} />}
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    {ogImageUrl && <meta property="og:image:width" content="1200" />}
+    {ogImageUrl && <meta property="og:image:height" content="630" />}
     <meta property="og:locale" content="en_US" />
 
-    <!-- Twitter -->
+    <!-- Twitter Card -->
     <meta
       name="twitter:card"
-      content={image ? "summary_large_image" : "summary"}
+      content={ogImageUrl ? "summary_large_image" : "summary"}
     />
-    {title && <meta name="twitter:title" content={title} />}
+    <meta name="twitter:title" content={title} />
     {description && <meta name="twitter:description" content={description} />}
-    {image && <meta name="twitter:image" content={image} />}
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+
+    <!-- JSON-LD -->
+    {
+      churchJsonLd && (
+        <script
+          is:inline
+          type="application/ld+json"
+          set:html={JSON.stringify(churchJsonLd)}
+        />
+      )
+    }
+    {
+      websiteJsonLd && (
+        <script
+          is:inline
+          type="application/ld+json"
+          set:html={JSON.stringify(websiteJsonLd)}
+        />
+      )
+    }
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

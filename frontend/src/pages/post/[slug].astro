@@ -32,15 +32,14 @@ const dataAttr = visualEditingEnabled
 const seoTitle = post.seo?.metaTitle || post.title;
 const seoDescription = post.seo?.metaDescription || post.excerpt;
 const ogImageSource = post.seo?.ogImage ?? post.mainImage;
-const ogImage = ogImageSource
-  ? urlFor(ogImageSource).width(1200).height(630).fit("crop").auto("format").quality(80).url()
-  : undefined;
 ---
 
 <Layout
-  title={seoTitle ?? "Post"}
-  description={seoDescription}
-  image={ogImage}
+  pageSeo={{
+    title: seoTitle ?? "Post",
+    description: seoDescription,
+    ogImage: ogImageSource,
+  }}
 >
   <section class="w-full my-1 mb-5">
     {

@@ -81,6 +81,11 @@ export async function getHome() {
         backgroundColor,
         textColor,
       },
+      seo {
+        metaTitle,
+        metaDescription,
+        ogImage ${imageProjection},
+      },
     }`,
   );
 }
@@ -142,6 +147,11 @@ export async function getAbout() {
         backgroundColor,
         textColor,
       },
+      seo {
+        metaTitle,
+        metaDescription,
+        ogImage ${imageProjection},
+      },
     }`,
   );
 }
@@ -169,6 +179,11 @@ export async function getTeamMember(slug: string) {
       image ${imageProjection},
       bio,
       order,
+      seo {
+        metaTitle,
+        metaDescription,
+        ogImage ${imageProjection},
+      },
     }`,
     { slug },
   );
@@ -184,11 +199,22 @@ export async function getContact() {
       closingMessage,
       closingBackgroundColor,
       closingTextColor,
+      seo {
+        metaTitle,
+        metaDescription,
+        ogImage ${imageProjection},
+      },
     }`,
   );
 }
 
 // ---- Types ----
+
+export interface SeoOverride {
+  metaTitle?: string;
+  metaDescription?: string;
+  ogImage?: SanityImage;
+}
 
 export interface SanityImage {
   _type: "image";
@@ -255,6 +281,7 @@ export interface Home {
     backgroundColor?: SanityColor;
     textColor?: SanityColor;
   };
+  seo?: SeoOverride;
 }
 
 export interface Header {
@@ -304,6 +331,7 @@ export interface About {
     backgroundColor?: SanityColor;
     textColor?: SanityColor;
   };
+  seo?: SeoOverride;
 }
 
 export interface TeamMember {
@@ -314,6 +342,7 @@ export interface TeamMember {
   image?: SanityImage;
   bio?: any[];
   order: number;
+  seo?: SeoOverride;
 }
 
 export interface Contact {
@@ -324,4 +353,5 @@ export interface Contact {
   closingMessage?: string;
   closingBackgroundColor?: SanityColor;
   closingTextColor?: SanityColor;
+  seo?: SeoOverride;
 }

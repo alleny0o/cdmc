@@ -12,8 +12,12 @@ const home = await getHome() as Home;
 ---
 
 <Layout
-  title={settings?.siteTitle || settings?.churchName || "Welcome"}
-  description={settings?.siteDescription}
+  settings={settings}
+  pageSeo={{
+    title: home?.seo?.metaTitle,
+    description: home?.seo?.metaDescription,
+    ogImage: home?.seo?.ogImage,
+  }}
 >
   <Hero home={home} settings={settings} />
   <WhoWeAre home={home} />
