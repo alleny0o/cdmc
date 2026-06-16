@@ -1,0 +1,194 @@
+---
+import type { Contact, Settings } from "../utils/sanity";
+import { urlFor } from "../utils/image";
+import Container from "./Container.astro";
+
+interface Props {
+  contact: Contact;
+  settings: Settings;
+}
+
+const { contact, settings } = Astro.props;
+
+const bgColor = contact?.backgroundColor?.hex || "#ffffff";
+const textColor = contact?.textColor?.hex || "#111111";
+const heading = contact?.heading || "Contact";
+const email = settings?.email;
+const hasForm = !!email;
+const hasImage = !!contact?.image;
+
+const closingMessage = contact?.closingMessage || "May the grace of Christ be with you.";
+const closingBgColor = contact?.closingBackgroundColor?.hex || "#fefce8";
+const closingTextColor = contact?.closingTextColor?.hex || "#78716c";
+
+const formEndpoint = import.meta.env.PUBLIC_FORMSPREE_ENDPOINT;
+---
+
+<!-- Toast -->
+<div id="toast" class="toast">
+  <span id="toast-message"></span>
+</div>
+
+<!-- Form section -->
+<section id="contact" class="min-h-[70vh]" style={`background-color: ${bgColor}; color: ${textColor}`}>
+  <Container class="py-20 flex flex-col lg:flex-row gap-12 lg:gap-16 items-center">
+
+    <!-- Form side -->
+    <div class="w-full lg:flex-1">
+      <p class="section-label text-xs uppercase tracking-[0.25em] mb-4">{heading}</p>
+      <div class="w-8 h-px mb-12 section-divider"></div>
+
+      {hasForm ? (
+        <form action={formEndpoint} method="POST" class="flex flex-col gap-5">
+          <div class="flex flex-col gap-1.5">
+            <label class="section-sublabel text-xs uppercase tracking-[0.25em]" for="name">Name</label>
+            <input id="name" type="text" name="name" required placeholder="Your name"
+              class="form-input text-sm font-light px-4 py-3 outline-none w-full" />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="section-sublabel text-xs uppercase tracking-[0.25em]" for="email">Email</label>
+            <input id="email" type="email" name="email" required placeholder="your@email.com"
+              class="form-input text-sm font-light px-4 py-3 outline-none w-full" />
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="section-sublabel text-xs uppercase tracking-[0.25em]" for="message">Message</label>
+            <textarea id="message" name="message" required rows="5" placeholder="How can we help?"
+              class="form-input text-sm font-light px-4 py-3 outline-none w-full resize-none"></textarea>
+          </div>
+          <button type="submit"
+            class="form-button text-xs uppercase tracking-[0.25em] py-3.5 px-8 self-start mt-2 transition-opacity hover:opacity-80 cursor-pointer">
+            Send Message
+          </button>
+        </form>
+      ) : (
+        <p class="section-sublabel text-sm font-light">No contact email configured.</p>
+      )}
+    </div>
+
+    <!-- Image side -->
+    <div class="w-full lg:flex-1 h-[60vw] xl:h-auto xl:aspect-4/3">
+      {hasImage && contact?.image ? (
+        <img
+          src={urlFor(contact.image).width(1200).quality(90).format("webp").url()}
+          alt="Our Church"
+          class="w-full h-full object-cover object-center"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <div class="w-full h-full section-placeholder" />
+      )}
+    </div>
+
+  </Container>
+</section>
+
+<!-- Closing section -->
+<section class="min-h-[25vh] flex items-center justify-center" style={`background-color: ${closingBgColor}; color: ${closingTextColor}`}>
+  <div class="text-center px-8">
+    <p class="font-serif italic text-2xl md:text-3xl leading-relaxed">{closingMessage}</p>
+  </div>
+</section>
+
+<style define:vars={{ bgColor, textColor }}>
+  #contact {
+    background-color: var(--bgColor);
+  }
+  .section-label {
+    color: var(--textColor);
+    opacity: 0.4;
+    display: block;
+  }
+  .section-divider {
+    background-color: var(--textColor);
+    opacity: 0.2;
+  }
+  .section-sublabel {
+    color: var(--textColor);
+    opacity: 0.5;
+  }
+  .form-input {
+    color: var(--textColor);
+    background-color: color-mix(in srgb, var(--textColor) 6%, transparent);
+    border: 1.5px solid color-mix(in srgb, var(--textColor) 18%, transparent);
+    transition: border-color 0.2s, background-color 0.2s;
+  }
+  .form-input::placeholder {
+    color: var(--textColor);
+    opacity: 0.25;
+  }
+  .form-input:focus {
+    background-color: color-mix(in srgb, var(--textColor) 9%, transparent);
+    border-color: color-mix(in srgb, var(--textColor) 55%, transparent);
+  }
+  .form-button {
+    color: var(--bgColor);
+    background-color: var(--textColor);
+    border: 1.5px solid var(--textColor);
+  }
+  .section-placeholder {
+    background-color: color-mix(in srgb, var(--textColor) 5%, transparent);
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(120%);
+    z-index: 999;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    font-weight: 300;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.success {
+    background-color: #1a1a1a;
+    color: #e8e5df;
+  }
+  .toast.error {
+    background-color: #7f1d1d;
+    color: #fecaca;
+  }
+</style>
+
+<script>
+  const form = document.querySelector("form");
+  const toast = document.getElementById("toast");
+  const toastMessage = document.getElementById("toast-message");
+  let toastTimer: ReturnType<typeof setTimeout>;
+
+  function showToast(message: string, type: "success" | "error") {
+    if (!toast || !toastMessage) return;
+    clearTimeout(toastTimer);
+    toastMessage.textContent = message;
+    toast.className = `toast ${type} show`;
+    toastTimer = setTimeout(() => {
+      toast.classList.remove("show");
+    }, 4000);
+  }
+
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const res = await fetch(form.action, {
+      method: "POST",
+      body: new FormData(form),
+      headers: { Accept: "application/json" },
+    });
+
+    if (res.ok) {
+      form.reset();
+      showToast("Message sent. We'll be in touch.", "success");
+    } else {
+      showToast("Something went wrong. Please try again.", "error");
+    }
+  });
+</script>

@@ -1,0 +1,46 @@
+---
+import type { Home } from "../utils/sanity";
+import { urlFor } from "../utils/image";
+import Container from "./Container.astro";
+
+interface Props {
+  home: Home;
+}
+
+const { home } = Astro.props;
+const section = home?.feature;
+
+const bgColor = section?.backgroundColor?.hex || "#f0ede8";
+const textColor = section?.textColor?.hex || "#111111";
+const label = section?.label || "Mustard Seed Faith";
+const reference = section?.reference || "Matthew 17:20";
+---
+
+<section
+  class="md:h-[clamp(600px,80vh,800px)]"
+  style={`background-color: ${bgColor}; color: ${textColor}`}
+>
+  <Container class="h-full py-20 flex flex-col md:flex-row gap-12 md:gap-16">
+
+    <div class="h-[60vw] md:h-auto md:basis-[65%]">
+      {section?.image ? (
+        <img
+          src={urlFor(section.image).width(1400).quality(90).format("webp").url()}
+          alt={label}
+          class="block h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <div class="h-full w-full bg-current opacity-5" />
+      )}
+    </div>
+
+    <div class="flex flex-col justify-center items-center text-center md:basis-[35%] md:items-start md:text-left">
+      <p class="text-xs uppercase tracking-[0.25em] opacity-40">{label}</p>
+      <div class="my-4 h-px w-8 bg-current opacity-20"></div>
+      <p class="text-xs uppercase tracking-[0.25em] opacity-40">{reference}</p>
+    </div>
+
+  </Container>
+</section>

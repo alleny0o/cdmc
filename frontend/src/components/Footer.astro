@@ -1,0 +1,73 @@
+---
+import { getSettings, getFooter } from "../utils/sanity";
+import type { Settings, Footer } from "../utils/sanity";
+import { urlFor } from "../utils/image";
+import Container from "./Container.astro";
+
+const settings = (await getSettings()) as Settings;
+const footer = (await getFooter()) as Footer;
+
+const bgColor = footer?.backgroundColor?.hex || "#083b56";
+const textColor = footer?.textColor?.hex || "#c9c4b9";
+const phone = settings?.phone || "(000) 000-0000";
+const churchName = settings?.churchName || "Your Church Name";
+const address = settings?.address || "123 Main St, City, MD 00000";
+const mapsUrl = `https://www.google.com/maps/dir//${encodeURIComponent(address)}`;
+const phoneHref = `tel:+1${phone.replace(/\D/g, "")}`;
+const year = new Date().getFullYear();
+
+const featured = footer?.featuredLink;
+const hasFeaturedImage = !!featured?.image;
+const showFeatured = hasFeaturedImage && !!featured?.url;
+---
+
+<footer style={`background-color: ${bgColor}; color: ${textColor}`}>
+  <Container class="pt-12 pb-8 md:pt-16 md:pb-10">
+    <div class="flex flex-col gap-10 pb-8 mb-6 md:flex-row md:items-start md:justify-between md:gap-12 md:pb-10" style="border-bottom: 0.5px solid rgba(201,196,185,0.15)">
+
+      <!-- Left: church info -->
+      <div class="flex flex-col gap-5 min-w-0">
+        <a href="/">
+          {settings?.logo ? (
+            <img
+              src={urlFor(settings.logo).width(600).quality(100).format("webp").url()}
+              alt={churchName}
+              class="h-14 w-auto self-start transition-transform duration-300 hover:scale-105"
+            />
+          ) : (
+            <p class="text-[11px] uppercase tracking-[0.25em]">{churchName}</p>
+          )}
+        </a>
+        <div class="flex flex-col gap-2.5">
+          <a href={mapsUrl} target="_blank" rel="noopener"
+            class="text-xs font-light opacity-55 hover:opacity-90 transition-opacity">
+            {address}
+          </a>
+          <a href={phoneHref}
+            class="text-xs font-light opacity-55 hover:opacity-90 transition-opacity">
+            {phone}
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: featured -->
+      {showFeatured && (
+        <a href={featured!.url} target="_blank" rel="noopener"
+          class="flex flex-col items-start gap-2 shrink-0 hover:opacity-75 transition-opacity md:items-end">
+          {featured!.label && (
+            <p class="text-[10px] uppercase tracking-[0.2em] opacity-40">{featured!.label}</p>
+          )}
+          <img
+            src={urlFor(featured!.image!).height(330).quality(90).format("webp").url()}
+            alt={featured!.label || featured!.linkText || ""}
+            class="h-28 w-auto object-cover md:h-32"
+          />
+        </a>
+      )}
+
+    </div>
+
+    <!-- Bottom -->
+    <p class="text-[11px] opacity-35 tracking-wide">&copy; {year} {churchName}</p>
+  </Container>
+</footer>

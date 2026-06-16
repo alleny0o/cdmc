@@ -1,0 +1,17 @@
+---
+import { getAbout, getTeamMembers } from "../utils/sanity";
+import type { About, TeamMember } from "../utils/sanity";
+import Layout from "../layouts/Layout.astro";
+import AboutUs from "../components/AboutUs.astro";
+import OurHistory from "../components/OurHistory.astro";
+import OurTeam from "../components/OurTeam.astro";
+
+const about = (await getAbout()) as About;
+const team = (await getTeamMembers()) as TeamMember[];
+---
+
+<Layout title="About">
+  <AboutUs about={about} />
+  <OurHistory about={about} />
+  <OurTeam about={about} team={team} />
+</Layout>

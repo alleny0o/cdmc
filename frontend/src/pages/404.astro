@@ -1,14 +1,36 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import Bare from "../layouts/Bare.astro";
+import { getSettings } from "../utils/sanity";
+import type { Settings } from "../utils/sanity";
+import { urlFor } from "../utils/image";
+
+const settings = (await getSettings()) as Settings;
 ---
 
-<Layout title="Page not found — Astro + Sanity">
-  <div class="flex flex-col items-start px-3 pt-13 gap-3">
-    <p class="font-mono text-sm font-medium text-gray-600 m-0 tracking-widest">404</p>
-    <h1 class="font-sans text-5xl font-extrabold leading-12 -tracking-[0.025em] m-0 text-black">Page not found</h1>
-    <p class="font-serif text-xl leading-7 text-gray-600 m-0">
-      The page you're looking for doesn't exist or has been moved.
-    </p>
-    <a class="font-sans text-base font-medium text-blue-600 no-underline mt-2 hover:underline" href="/">← Back to home</a>
-  </div>
-</Layout>
+<Bare title="404 — Page Not Found">
+  <section class="min-h-screen bg-[#083b56] flex items-center justify-center text-[#c9c4b9]">
+    <div class="text-center px-8 flex flex-col items-center gap-8">
+
+      {settings?.logo && (
+        <img
+          src={urlFor(settings.logo).width(300).quality(100).format("webp").url()}
+          alt={settings?.churchName || ""}
+          class="h-16 w-auto opacity-60"
+        />
+      )}
+
+      <div class="flex flex-col items-center gap-3">
+        <p class="text-xs uppercase tracking-[0.25em] opacity-40">404</p>
+        <div class="w-8 h-px bg-current opacity-20"></div>
+        <p class="font-serif italic text-xl opacity-70">
+          This page could not be found.
+        </p>
+      </div>
+
+      <a href="/" class="text-xs uppercase tracking-[0.2em] opacity-40 hover:opacity-80 transition-opacity">
+        ← Back to home
+      </a>
+
+    </div>
+  </section>
+</Bare>

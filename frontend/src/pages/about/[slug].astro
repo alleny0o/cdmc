@@ -1,0 +1,78 @@
+---
+import { getTeamMembers, getTeamMember } from "../../utils/sanity";
+import type { TeamMember } from "../../utils/sanity";
+import { urlFor } from "../../utils/image";
+import { PortableText } from "astro-portabletext";
+import Layout from "../../layouts/Layout.astro";
+import Container from "../../components/Container.astro";
+
+export async function getStaticPaths() {
+  const team = await getTeamMembers();
+  return team.map((member: TeamMember) => ({
+    params: { slug: member.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const member = (await getTeamMember(slug!)) as TeamMember;
+
+if (!member) {
+  return Astro.redirect("/about");
+}
+---
+
+<Layout title={member.name}>
+  <section class="bg-white text-[#111111]">
+    <Container class="py-20">
+
+      <!-- Back link -->
+      <a href="/about" class="text-[11px] uppercase tracking-[0.2em] opacity-40 hover:opacity-80 transition-opacity block mb-12">
+        ← Our Team
+      </a>
+
+      <div class="flex flex-col md:flex-row gap-0">
+
+        <!-- Image -->
+        <div class="md:w-64 shrink-0 flex flex-col gap-3 mb-10 md:mb-0">
+          {member.image ? (
+            <img
+              src={urlFor(member.image).width(600).quality(90).format("webp").url()}
+              alt={member.name}
+              class="w-full aspect-3/4 object-cover"
+              loading="eager"
+              decoding="async"
+            />
+          ) : (
+            <div class="w-full aspect-3/4 bg-current opacity-5" />
+          )}
+        </div>
+
+        <!-- Vertical rule -->
+        <div class="hidden md:block w-px bg-current opacity-15 mx-10 self-stretch"></div>
+
+        <!-- Bio -->
+        <div class="flex-1">
+          <p class="text-[10px] uppercase tracking-[0.2em] opacity-40 mb-2">{member.role}</p>
+          <h1 class="text-2xl font-light tracking-wide mb-8">{member.name}</h1>
+          {member.bio ? (
+            <div class="bio-body font-serif italic text-xl leading-relaxed">
+              <PortableText value={member.bio} />
+            </div>
+          ) : (
+            <p class="font-serif italic text-xl leading-relaxed opacity-40">No bio available.</p>
+          )}
+        </div>
+
+      </div>
+    </Container>
+  </section>
+</Layout>
+
+<style>
+  .bio-body :global(p + p) {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 0.5px solid currentColor;
+    opacity: 0.85;
+  }
+</style>

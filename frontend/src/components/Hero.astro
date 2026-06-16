@@ -1,0 +1,111 @@
+---
+import type { Home, Settings } from "../utils/sanity";
+import { urlFor } from "../utils/image";
+
+interface Props {
+  home: Home;
+  settings: Settings;
+}
+
+const { home, settings } = Astro.props;
+
+const headline =
+  home?.hero?.headline ||
+  settings?.churchName ||
+  "Christ Disciple Mission Church";
+const subheadline =
+  home?.hero?.subheadline ||
+  settings?.tagline ||
+  "Fall in Love, Again and Again";
+const overlayOpacity = home?.hero?.overlayOpacity ?? 50;
+const bgColor = home?.hero?.backgroundColor?.hex || "#083b56";
+const textColor = home?.hero?.textColor?.hex || "#ffffff";
+---
+
+<section
+  id="hero"
+  class="relative w-full flex items-center justify-center"
+  style="min-height: calc(100vh - var(--header-height, 80px));"
+>
+  <!-- Background Image -->
+  {
+    home?.hero?.backgroundImage && (
+      <img
+        src={urlFor(home.hero.backgroundImage)
+          .width(1920)
+          .quality(90)
+          .format("webp")
+          .url()}
+        alt=""
+        class="absolute inset-0 w-full h-full object-cover"
+        loading="eager"
+        fetchpriority="high"
+        width="1920"
+        height="1080"
+      />
+    )
+  }
+
+  <!-- Overlay -->
+  <div class="absolute inset-0 overlay"></div>
+
+  <!-- Content -->
+<div class="relative z-10 text-center px-8 max-w-2xl md:max-w-3xl mx-auto">
+  <h1 class="font-sans text-[28px] md:text-3xl lg:text-4xl font-light tracking-[0.15em] uppercase mb-5 hero-headline md:whitespace-nowrap">
+    {headline}
+  </h1>
+  <div class="w-12 h-px mx-auto hero-divider"></div>
+  <p class="font-serif italic text-lg md:text-xl font-light hero-subheadline">
+    {subheadline}
+  </p>
+</div>
+
+  <!-- Verse of the Year - glassmorphic card bottom right -->
+  {
+    settings?.verseOfTheYear?.text && (
+      <div class="hidden md:block absolute bottom-8 right-8 max-w-xs p-5 verse-card">
+        <p class="font-serif text-sm italic mb-2 verse-text">
+          "{settings.verseOfTheYear.text}"
+        </p>
+        <p class="text-xs font-light verse-ref">
+          {settings.verseOfTheYear.reference}
+        </p>
+      </div>
+    )
+  }
+</section>
+
+<style
+  define:vars={{
+    bgColor,
+    textColor,
+    overlayOpacity: overlayOpacity / 100,
+  }}
+>
+  #hero {
+    background-color: var(--bgColor);
+  }
+  .overlay {
+    background-color: rgba(0, 0, 0, var(--overlayOpacity));
+  }
+  .hero-headline {
+    color: var(--textColor);
+  }
+  .hero-subheadline {
+    color: var(--textColor);
+    opacity: 0.85;
+  }
+  .verse-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+  }
+  .verse-text {
+    color: var(--textColor);
+  }
+  .verse-ref {
+    color: var(--textColor);
+    opacity: 0.7;
+  }
+</style>

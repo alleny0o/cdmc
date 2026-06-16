@@ -1,17 +1,22 @@
 ---
-import Card from "../components/Card.astro";
-import Welcome from "../components/Welcome.astro";
 import Layout from "../layouts/Layout.astro";
-import { getPosts } from "../utils/sanity";
+import Hero from "../components/Hero.astro";
+import WhoWeAre from "../components/WhoWeAre.astro";
+import ServiceTimes from "../components/ServiceTimes.astro";
+import { getSettings, getHome } from "../utils/sanity";
+import type { Settings, Home } from "../utils/sanity";
+import FeatureGallery from "../components/FeatureGallery.astro";
 
-const posts = await getPosts();
+const settings = await getSettings() as Settings;
+const home = await getHome() as Home;
 ---
 
 <Layout
-  title="Astro + Sanity"
-  description="A blog built with Astro and Sanity."
+  title={settings?.siteTitle || settings?.churchName || "Welcome"}
+  description={settings?.siteDescription}
 >
-  <section>
-    {posts.length ? posts.map((post) => <Card post={post} />) : <Welcome />}
-  </section>
+  <Hero home={home} settings={settings} />
+  <WhoWeAre home={home} />
+  <FeatureGallery home={home} />
+  <ServiceTimes home={home} />
 </Layout>

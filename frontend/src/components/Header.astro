@@ -1,0 +1,204 @@
+---
+import { getSettings, getHeader } from "../utils/sanity";
+import type { Settings, Header } from "../utils/sanity";
+import { urlFor } from "../utils/image";
+import Container from "./Container.astro";
+
+const settings = (await getSettings()) as Settings;
+const header = (await getHeader()) as Header;
+
+const backgroundColor = header?.backgroundColor?.hex || "#083b56";
+const navLinkColor = header?.navLinkColor?.hex || "#c9c4b9";
+const navLinkHoverColor = header?.navLinkHoverColor?.hex || "#e8e5df";
+const navLinkSize = header?.navLinkSize || 12;
+const logoSize = header?.logoSize || 64;
+const headerBehavior = header?.headerBehavior || "fixed";
+const mobileMenuBg = header?.mobileMenuBackgroundColor?.hex || backgroundColor;
+const mobileMenuText = header?.mobileMenuTextColor?.hex || navLinkColor;
+
+const path = Astro.url.pathname;
+---
+
+<header id="site-header" class="w-full z-50 top-0 left-0 right-0">
+  <Container class="py-1 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="/">
+      {
+        settings?.logo ? (
+          <img
+            src={urlFor(settings.logo).width(600).quality(100).format("webp").url()}
+            alt={settings?.churchName || "Church Logo"}
+            id="site-logo"
+            class="w-auto transition-transform duration-300 hover:scale-105"
+          />
+        ) : (
+          <span class="font-serif text-xl nav-link">
+            {settings?.churchName || "Church"}
+          </span>
+        )
+      }
+    </a>
+
+    <!-- Desktop Nav -->
+    <nav class="hidden lg:flex items-center gap-12">
+      <a href="/" class={`nav-link ${path === "/" ? "nav-active" : ""}`}>Home</a>
+      <a href="/about" class={`nav-link ${path.startsWith("/about") ? "nav-active" : ""}`}>About</a>
+      <a href="/contact" class={`nav-link ${path.startsWith("/contact") ? "nav-active" : ""}`}>Contact</a>
+    </nav>
+
+    <!-- Mobile Hamburger -->
+    <button id="hamburger" class="lg:hidden flex flex-col justify-center gap-1.5 p-2 cursor-pointer" aria-label="Toggle menu">
+      <span class="bar block w-6 h-0.5"></span>
+      <span class="bar block w-6 h-0.5"></span>
+      <span class="bar block w-6 h-0.5"></span>
+    </button>
+  </Container>
+</header>
+
+<!-- Mobile Menu -->
+<div id="mobile-menu" class="mobile-menu lg:hidden">
+  <a href="/" class={`mobile-link ${path === "/" ? "mobile-active" : ""}`}>Home</a>
+  <a href="/about" class={`mobile-link ${path.startsWith("/about") ? "mobile-active" : ""}`}>About</a>
+  <a href="/contact" class={`mobile-link ${path.startsWith("/contact") ? "mobile-active" : ""}`}>Contact</a>
+</div>
+
+<style define:vars={{
+  backgroundColor,
+  navLinkColor,
+  navLinkHoverColor,
+  navLinkSize: `${navLinkSize}px`,
+  logoSize: `${logoSize}px`,
+  mobileMenuBg,
+  mobileMenuText,
+}}>
+  #site-header {
+    background-color: var(--backgroundColor);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition: transform 0.3s ease;
+  }
+
+  #site-logo {
+    height: var(--logoSize);
+  }
+
+  .nav-link {
+    color: var(--navLinkColor);
+    font-size: var(--navLinkSize);
+    font-weight: 200;
+    letter-spacing: 0.08em;
+    opacity: 0.55;
+    transition: opacity 0.2s ease;
+  }
+  .nav-link:hover { opacity: 0.9; }
+  .nav-active { opacity: 1; }
+
+  .bar {
+    background-color: var(--navLinkColor);
+    transition: all 0.3s ease;
+    transform-origin: center;
+  }
+
+  /* X state */
+  #hamburger.open .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  #hamburger.open .bar:nth-child(2) { opacity: 0; }
+  #hamburger.open .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+  /* Mobile menu — hidden by default, slides down when .open added */
+  .mobile-menu {
+    position: fixed;
+    top: var(--header-height, 60px);
+    left: 0;
+    right: 0;
+    z-index: 40;
+    background-color: var(--mobileMenuBg);
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    gap: 2rem;
+    transform: translateY(-110%);
+    transition: transform 0.3s ease;
+    visibility: hidden;
+  }
+  .mobile-menu.open {
+    transform: translateY(0);
+    visibility: visible;
+  }
+
+  .mobile-link {
+    color: var(--mobileMenuText);
+    font-size: 19px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    opacity: 0.55;
+    transition: opacity 0.2s ease;
+  }
+  .mobile-link:hover { opacity: 0.9; }
+  .mobile-active { opacity: 1; }
+
+  #site-header.hidden-header { transform: translateY(-100%); }
+</style>
+
+<script define:vars={{ headerBehavior }}>
+  const header = document.getElementById("site-header");
+  const hamburger = document.getElementById("hamburger");
+  const menu = document.getElementById("mobile-menu");
+
+  // Measure header height so menu sits flush below it
+  if (header) {
+    document.documentElement.style.setProperty(
+      "--header-height",
+      header.offsetHeight + "px"
+    );
+  }
+
+  // Toggle
+  hamburger?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    hamburger.classList.toggle("open");
+    menu?.classList.toggle("open");
+  });
+
+  // Close on link click
+  menu?.querySelectorAll("a").forEach((a) => {
+    a.addEventListener("click", () => {
+      hamburger?.classList.remove("open");
+      menu.classList.remove("open");
+    });
+  });
+
+  // Close on outside click
+  document.addEventListener("click", (e) => {
+    if (menu?.classList.contains("open") && !menu.contains(e.target) && !hamburger?.contains(e.target)) {
+      hamburger?.classList.remove("open");
+      menu.classList.remove("open");
+    }
+  });
+
+  // Close instantly on scroll
+  window.addEventListener("scroll", () => {
+    if (menu?.classList.contains("open")) {
+      hamburger?.classList.remove("open");
+      menu.classList.remove("open");
+    }
+  }, { passive: true });
+
+  // Auto-close when resizing to desktop
+  window.addEventListener("resize", () => {
+    if (window.innerWidth >= 1024) {
+      hamburger?.classList.remove("open");
+      menu?.classList.remove("open");
+    }
+  });
+
+  // Smart hide
+  if (headerBehavior === "smart" && header) {
+    let lastY = window.scrollY;
+    window.addEventListener("scroll", () => {
+      const y = window.scrollY;
+      header.classList.toggle("hidden-header", y > lastY && y > 80);
+      lastY = y;
+    }, { passive: true });
+  }
+</script>

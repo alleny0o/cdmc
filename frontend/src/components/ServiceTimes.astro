@@ -1,0 +1,82 @@
+---
+import type { Home } from "../utils/sanity";
+
+interface Props {
+  home: Home;
+}
+
+const { home } = Astro.props;
+
+const section = home?.serviceTimes;
+const bgColor = section?.backgroundColor?.hex || "#f9f6f1";
+const textColor = section?.textColor?.hex || "#111111";
+---
+
+<section id="service-times">
+  <div class="max-w-2xl mx-auto px-8 py-20">
+
+    <!-- Label -->
+    <p class="section-label text-xs uppercase tracking-[0.25em] text-center mb-4">Service Times</p>
+    <div class="w-8 h-px mx-auto mb-12 section-divider"></div>
+
+    <!-- Times -->
+    <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-20">
+
+      <!-- Korean -->
+      <div class="text-center">
+        <p class="section-sublabel text-xs uppercase tracking-[0.2em] mb-3">Korean Service</p>
+        <p class="section-time font-sans text-3xl font-extralight tracking-wide">9:30 AM</p>
+      </div>
+
+      <!-- Cross divider -->
+      <div class="hidden md:block section-cross text-2xl font-extralight">†</div>
+
+      <!-- English -->
+      <div class="text-center">
+        <p class="section-sublabel text-xs uppercase tracking-[0.2em] mb-3">English Service</p>
+        <p class="section-time font-sans text-3xl font-extralight tracking-wide">11:00 AM</p>
+      </div>
+
+    </div>
+
+    <!-- Joint service -->
+    <div class="mt-14 text-center">
+      <p class="section-sublabel text-xs uppercase tracking-[0.2em] mb-2">
+        Joint Service &middot; First Sunday &middot; 11:00 AM
+      </p>
+      <p class="section-note font-serif italic text-xs tracking-wide">
+        Korean and English congregations worship together.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<style define:vars={{ bgColor, textColor }}>
+  #service-times {
+    background-color: var(--bgColor);
+  }
+  .section-label {
+    color: var(--textColor);
+    opacity: 0.4;
+  }
+  .section-divider {
+    background-color: var(--textColor);
+    opacity: 0.2;
+  }
+  .section-cross {
+    color: var(--textColor);
+    opacity: 0.2;
+  }
+  .section-sublabel {
+    color: var(--textColor);
+    opacity: 0.5;
+  }
+  .section-time {
+    color: var(--textColor);
+  }
+  .section-note {
+    color: var(--textColor);
+    opacity: 0.4;
+  }
+</style>

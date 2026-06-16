@@ -1,0 +1,78 @@
+---
+import type { About } from "../utils/sanity";
+import { urlFor } from "../utils/image";
+import { PortableText } from "astro-portabletext";
+import Container from "./Container.astro";
+
+interface Props {
+  about: About;
+}
+
+const { about } = Astro.props;
+const section = about?.aboutUs;
+const bgColor = section?.backgroundColor?.hex || "#ffffff";
+const textColor = section?.textColor?.hex || "#111111";
+const title = section?.title || "About Us";
+const imageCaption = section?.imageCaption || "";
+const hasImage = !!section?.image;
+---
+
+<section id="about-us" style={`background-color: ${bgColor}; color: ${textColor}`}>
+  <Container class="py-20">
+    <span class="text-xs uppercase tracking-[0.25em] opacity-40 block mb-4">{title}</span>
+    <div class="w-8 h-px bg-current opacity-20" style="margin-bottom: 1.5rem;"></div>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8">
+
+      <!-- Text: 7/8 cols -->
+      <div class="md:col-span-7 lg:col-span-8">
+        {section?.body ? (
+          <div class="about-body font-serif italic text-xl leading-relaxed">
+            <PortableText value={section.body} />
+          </div>
+        ) : (
+          <p class="font-serif italic text-xl leading-relaxed opacity-85">
+            Christ Disciple Mission Church is dedicated to fulfilling the Great Commission by making disciples who make disciples.
+          </p>
+        )}
+      </div>
+
+      <!-- Image: 5/4 cols with vertical rule -->
+      <div class="md:col-span-5 lg:col-span-4 relative flex flex-col">
+        <div class="hidden md:block absolute top-0 left-0 h-full w-px bg-current opacity-15"></div>
+        <div class="md:pl-8 flex flex-col gap-3">
+          {hasImage && section?.image ? (
+            <>
+              <img
+                src={urlFor(section.image).width(600).quality(90).format("webp").url()}
+                alt={title}
+                class="w-full object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+              {imageCaption && (
+                <p class="font-serif italic text-xs opacity-40 text-center">{imageCaption}</p>
+              )}
+            </>
+          ) : (
+            <div class="w-full aspect-3/4 bg-current opacity-5" />
+          )}
+        </div>
+      </div>
+
+    </div>
+  </Container>
+</section>
+
+<style is:global>
+  .about-body p {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 0.5px solid rgba(17, 17, 17, 0.1);
+  }
+  .about-body p:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+</style>

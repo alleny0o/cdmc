@@ -1,0 +1,16 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ContactComponent from "../components/Contact.astro";
+import { getContact, getSettings } from "../utils/sanity";
+import type { Contact as ContactType, Settings } from "../utils/sanity";
+
+const contact = (await getContact()) as ContactType;
+const settings = (await getSettings()) as Settings;
+---
+
+<Layout
+  title={`${contact?.heading || "Contact"} | ${settings?.churchName || "CDMC"}`}
+  description={`Get in touch with ${settings?.churchName || "Christ Disciple Mission Church"}`}
+>
+  <ContactComponent contact={contact} settings={settings} />
+</Layout>

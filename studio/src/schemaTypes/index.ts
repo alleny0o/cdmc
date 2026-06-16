@@ -1,7 +1,10 @@
 import blockContent from './objects/blockContent'
 import seo from './objects/seo'
-import post from './documents/post'
+import settings from './documents/settings'
+import home from './documents/home'
+import header from './documents/header'
+import footer from './documents/footer'
+import contact from './documents/contact'
+import about from './documents/about'
 
-// Export an array of all the schema types.  This is used in the Sanity Studio configuration. https://www.sanity.io/docs/schema-types
-
-export const schemaTypes = [post, blockContent, seo]
+export const schemaTypes = [settings, home, about, header, footer, contact, blockContent, seo]
