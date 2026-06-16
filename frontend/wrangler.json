@@ -1,9 +1,0 @@
-{
-  "name": "cdmc",
-  "compatibility_date": "2026-01-01",
-  "compatibility_flags": ["nodejs_compat"],
-  "assets": {
-    "binding": "ASSETS",
-    "directory": "./dist/client"
-  }
-}

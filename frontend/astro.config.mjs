@@ -14,14 +14,14 @@ const studioUrl = PUBLIC_SANITY_STUDIO_URL || "http://localhost:3333";
 
 import sanity from "@sanity/astro";
 import react from "@astrojs/react";
-import cloudflare from "@astrojs/cloudflare";
+import vercel from "@astrojs/vercel";
 import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://yourdomain.com", // update this to your real domain
+  site: "https://yourdomain.com", // update to your real domain
   output: "server",
-  adapter: cloudflare(),
+  adapter: vercel(),
   integrations: [
     sanity({
       projectId,
