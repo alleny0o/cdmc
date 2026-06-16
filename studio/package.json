@@ -15,12 +15,13 @@
     "sanity"
   ],
   "dependencies": {
+    "@sanity/cli": "^7.2.3",
     "@sanity/code-input": "^7.1.0",
     "@sanity/color-input": "^6.0.4",
     "@sanity/vision": "^5.31.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "sanity": "^5.31.1",
+    "sanity": "^6.1.0",
     "styled-components": "^6.4.0"
   },
   "devDependencies": {
