@@ -19,7 +19,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://cdmclift.org", // update to your real domain
+  site: "https://cdmclife.org", // update to your real domain
   output: "server",
   adapter: vercel({
     isr: {
