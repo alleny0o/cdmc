@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://cdmc.vercel.app/sitemap.xml
+Sitemap: https://cdmclife.org/sitemap.xml
